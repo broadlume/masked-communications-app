@@ -39,9 +39,9 @@
   "scripts": {
     "dev": "nodemon -r dotenv/config index.ts",
     "loadtest": "node ./tests/loadtest.js",
-    "prepare": "ts-node scripts/preparePhoneNumberMap.ts",
+    "prepare": "bun run scripts/preparePhoneNumberMap.ts",
     "test": "jest",
-    "start": "bun run index.ts"
+    "start": "bun run prepare && bun run index.ts"
   },
   "version": "1.0.0",
   "main": "index.js",

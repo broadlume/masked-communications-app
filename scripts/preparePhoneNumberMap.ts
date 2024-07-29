@@ -13,7 +13,7 @@ async function preparePhoneNumberMap () {
 
   const phoneNumberList = (
     await fsp.readFile(
-      path.join(__dirname, '../src/data/phoneNumbers.txt'),
+      path.join(__dirname, '../phoneNumbers.txt'),
       'utf8'
     )
   ).split('\n')

@@ -5,3 +5,5 @@ launch.json
 coverage/
 .vscode
 .DS_Store
+src/data/phoneNumberMap.json
+phoneNumbers.txt
