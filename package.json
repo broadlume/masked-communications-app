@@ -40,7 +40,8 @@
     "dev": "nodemon -r dotenv/config index.ts",
     "loadtest": "node ./tests/loadtest.js",
     "prepare": "ts-node scripts/preparePhoneNumberMap.ts",
-    "test": "jest"
+    "test": "jest",
+    "start": "bun run index.ts"
   },
   "version": "1.0.0",
   "main": "index.js",
