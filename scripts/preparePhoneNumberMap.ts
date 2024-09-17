@@ -1,26 +1,51 @@
-import * as fsp from "fs/promises";
-import path from "path";
+import * as fsp from "node:fs/promises";
+import path from "node:path";
 import areaCodeGeos from "./areaCodeGeos";
+import { parseArgs } from "node:util";
+import { Twilio } from "twilio";
+
+if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+	throw new Error(
+		"Must have TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN in env vars",
+	);
+}
+const numberPool = parseArgs({
+	args: Bun.argv,
+	options: {
+		numberPool: {
+			type: "string",
+		},
+	},
+	strict: true,
+	allowPositionals: true
+}).values.numberPool;
+if (numberPool == null) {
+	throw new Error("Must pass in --numberPool flag as 'development' or 'production'.");
+}
+const SERVICE_IDS = {
+	development: "MG4b8b54ec0a6b494ce7713ae21a596b91",
+	production: "MG45c14b248d579bdfcc79684429a3ee1f",
+} as const;
 
 /****************************************************
  Formats a text list of phone numbers (in src/data/phone-numbers.txt) into the PhoneNumberMap
  structure.
 ****************************************************/
-
 async function preparePhoneNumberMap() {
+	const twilioClient = new Twilio(
+		process.env.TWILIO_ACCOUNT_SID,
+		process.env.TWILIO_AUTH_TOKEN,
+	);
 	const caAreaCodes = areaCodeGeos.ca.map(({ areaCode }) => areaCode);
 	const usAreaCodes = areaCodeGeos.us.map(({ areaCode }) => areaCode);
-	let phoneNumberList: string[];
-	try {
-		phoneNumberList = (
-			await fsp.readFile(path.join(__dirname, "../phoneNumbers.txt"), "utf8")
-		).split("\n");
-	} catch (e) {
-    console.error("Could not read 'phoneNumbers.txt' - does it exist?");
-    console.info("'phoneNumbers.txt' must contain a newline-delimited list of E164 phone numbers for the number pool");
-    throw e;
-  }
-  console.info(`Preparing ${phoneNumberList.length} phone numbers for the proxy pool...`);
+	const phoneNumberList: string[] = (
+		await twilioClient.messaging.v1
+			.services(SERVICE_IDS[numberPool])
+			.phoneNumbers.list()
+	).map((number) => number.phoneNumber);
+	console.info(
+		`[${numberPool} - ${SERVICE_IDS[numberPool]}]: Preparing ${phoneNumberList.length} phone numbers for the proxy pool...`,
+	);
 	const phoneNumberPoolMap = {
 		ca: {},
 		us: {},
@@ -34,14 +59,14 @@ async function preparePhoneNumberMap() {
 		if (!areaCode) throw Error(`${phoneNumber} is not valid E.164 format`);
 
 		// Check if area code is Canadian
-		if (caAreaCodes.includes(parseInt(areaCode))) {
+		if (caAreaCodes.includes(Number.parseInt(areaCode))) {
 			// If the area code has an entry in our number pool output...
 			if (phoneNumberPoolMap.ca[areaCode]) {
 				// Push the number into the existing array
 				phoneNumberPoolMap.ca[areaCode].push(phoneNumber);
 				// Otherwise create a new entry and array
 			} else phoneNumberPoolMap.ca[areaCode] = [phoneNumber];
-		} else if (usAreaCodes.includes(parseInt(areaCode))) {
+		} else if (usAreaCodes.includes(Number.parseInt(areaCode))) {
 			if (phoneNumberPoolMap.us[areaCode]) {
 				phoneNumberPoolMap.us[areaCode].push(phoneNumber);
 			} else phoneNumberPoolMap.us[areaCode] = [phoneNumber];
