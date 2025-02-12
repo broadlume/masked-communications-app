@@ -7,8 +7,7 @@ COPY . /app
 RUN apt-get update
 RUN bun install --frozen-lockfile --production
 EXPOSE 3000/tcp
-ARG NUMBER_POOL
-RUN bun run prepareNumberPool -- --numberPool $NUMBER_POOL
-CMD bun run start
+# ARG NUMBER_POOL
+CMD bun run prepareNumberPool -- --numberPool $NUMBER_POOL && bun run start
 
 
