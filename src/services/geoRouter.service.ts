@@ -32,7 +32,7 @@ export function getNearbyAreaCodeNumbers (
   const proximityMap = JSON.parse(JSON.stringify(areaCodeProximityMap))
 
   const areaCodesByProximity: number[] | string[] =
-    proximityMap[country][area]
+    proximityMap?.[country]?.[area] ?? areaCodeGeos[country].map((ac) => ac.areaCode)
 
   const countryPhoneMap = numberMap[country]
 
