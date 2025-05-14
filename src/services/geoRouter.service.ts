@@ -1,4 +1,4 @@
-import phoneNumberMap from '../data/phoneNumberMap.json'
+import {phoneNumberMap} from '../data/phoneNumberMap'
 import areaCodeProximityMap from '../data/areaCodeProximityMap.json'
 import phoneNumberParser from '../utils/phoneNumberParser'
 import areaCodeGeos from '../../scripts/areaCodeGeos'
