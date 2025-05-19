@@ -34,6 +34,8 @@
   "scripts": {
     "dev": "nodemon -r dotenv/config index.ts",
     "loadtest": "node ./tests/loadtest.js",
+    "fetch-env": "bun run ../../scripts/fetchEnvVariables.ts --secretName twilio-proxy-dev-env",
+    "fetch-env-prod": "bun run ../../scripts/fetchEnvVariables.ts --secretName twilio-proxy-prod-env",
     "check": "tsc --noEmit",
     "prepareNumberPool": "bun run scripts/preparePhoneNumberMap.ts",
     "test": "jest",
