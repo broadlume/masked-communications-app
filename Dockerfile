@@ -5,7 +5,7 @@ RUN mkdir -p /app
 WORKDIR /app
 COPY . /app
 RUN apt-get update
-RUN bun install --frozen-lockfile --production
+RUN bun install --production
 EXPOSE 3000/tcp
 CMD bun run start
 
